@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo de jogo</title>
+    <style>
+        body {
+            background-color: rgb(209, 209, 209);
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <canvas id="Canvas" width="500" height="500" style="border:2px solid #000000; margin-top: 100px;"></canvas>
+    </center>
+    </canvas>
+
+    <script>
+        class Jogador {
+            canvas = document.getElementById("Canvas");
+            // O personagem do jogador éum objeto de uma classe
+            ctx = {
+
+                corpo: this.canvas.getContext("2d"),
+
+
+                desenhar: function (y, x, a, l) {
+                    this.corpo.fillStyle = "blue"
+                    this.corpo.fillRect(y, x, a, l);
+                },
+
+                apagar: function (y, x, a, l) {
+                    this.corpo.clearRect(y, x, a, l)
+                },
+
+
+            }
+
+            // movimento da     
+            Eixo_x = 0;
+            Eixo_y = 0;
+            // corpo da figura
+            Largura = 100;
+            Altura = 100;
+            Inicializar() {
+                this.ctx.desenhar(this.Eixo_x, this.Eixo_y, this.Altura, this.Largura);
+
+                // this.ctx.(this.Eixo_y, this.Eixo_x, this.Altura, this.Largura);
+            }
+            RemoverMovimento() {
+                this.ctx.apagar(0, 0, this.canvas.width, this.canvas.height)
+                // this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+            AdicionarMovimento_eixoY(valor) {
+                this.Eixo_y += valor;
+                this.ctx.desenhar(this.Eixo_x, this.Eixo_y, this.Altura, this.Largura)
+                // this.ctx.fillRect(this.Eixo_x, this.Eixo_y, this.Altura, this.Largura);
+            }
+            AdicionarMovimento_eixoX(valor) {
+
+                this.Eixo_x += valor;
+                this.ctx.desenhar(this.Eixo_x, this.Eixo_y, this.Altura, this.Largura)
+                // this.ctx.fillRect(this.Eixo_x, this.Eixo_y, this.Altura, this.Largura);
+            }
+        }
+
+        class Obstaculo {
+            canvas = document.getElementById("Canvas");
+            ctx1 = this.canvas.getContext("2d");
+
+            // um objeto
+            cenario =
+                [
+                    // [eixo x(posicao), eixo y(posicao),eixo x(aresta), eixo y(aresta), ]
+                    [200, 0, 10, 0],
+                    [200, 100, 10, 0],
+                    [200, 150, 10, 0],
+                    [200, 200, 10, 0],
+                    [200, 400, 10, 0],
+                ]
+            // anatomia figura
+            Largura = 100;
+            Altura = 100;
+
+
+            Inicializar() {
+                this.ctx1.fillStyle = "black";
+                for (let obs of this.cenario) {
+                    this.ctx1.fillRect(obs[0], obs[1], this.Altura, this.Largura);
+                }
+            }
+
+            Lado_x() {
+                return this.cenario[0][2]
+            }
+
+            Lado_y() {
+                return this.cenario[0][3]
+            }
+
+        }
+
+        const jogador = new Jogador();
+        const obstaculo = new Obstaculo();
+
+        const canvas = document.getElementById("Canvas");
+        canvas.onload = obstaculo.Inicializar();
+        canvas.onload = jogador.Inicializar();
+
+        function move(event) {
+            let lado = [obstaculo.Lado_x(), obstaculo.Lado_y()]
+            let tecla = event.which;
+            /*37 -Esquerda - 38-cima - 39-direita 40-baixo*/
+            // A ideia é deletar o quadro anterior e criar um quadro novo, dando a falsa ideia de movimento.
+
+            jogador.RemoverMovimento();
+            obstaculo.Inicializar();
+            // Movimenta para Baixo e se passar volta ao começo
+            if (tecla == 40) {
+                // console.log(jogador.canvas.height)
+                if (jogador.Eixo_y <= 350) {
+                    jogador.AdicionarMovimento_eixoY(50);
+                }
+                else {
+                    jogador.AdicionarMovimento_eixoY(-400);
+                }
+            }
+            // // Movimenta para Cima e se passar volta ao começo
+            if (tecla == 38) {
+                if (jogador.Eixo_y <= 400 && jogador.Eixo_y >= 50) {
+                    jogador.AdicionarMovimento_eixoY(-50);
+                }
+                else {
+                    jogador.AdicionarMovimento_eixoY(400);
+                }
+            }
+            // // Movimenta para a Direita e se passar volta ao começo
+            if (tecla == 39) {
+                // console.log(jogador.Eixo_x)
+                if (jogador.Eixo_x <= 350 && jogador.Eixo_x >= 0) {
+                    if (jogador.Eixo_x == lado[0]) {
+                        alert("Movimento impossível")
+
+                        // jogador.AdicionarMovimento_eixoX(0);
+                        // jogador.AdicionarMovimento_eixoY(0);
+                    }
+                    jogador.AdicionarMovimento_eixoX(50);
+                }
+                else {
+                    jogador.AdicionarMovimento_eixoX(-400);
+                }
+
+            }
+            // Movimenta para a Esquerda e se passar volta ao começo
+            if (tecla == 37) {
+                // console.log(jogador.Eixo_x)
+                if (jogador.Eixo_x >= 0 && jogador.Eixo_x >= 50) {
+
+                    jogador.AdicionarMovimento_eixoX(-50);
+                } else {
+                    jogador.AdicionarMovimento_eixoX(400);
+                }
+
+            }
+
+            console.log(jogador.Eixo_x)
+
+        }
+        document.addEventListener("keydown", move);
+
+
+    </script>
+
+</html>
